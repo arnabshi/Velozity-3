@@ -20,12 +20,12 @@ export class LogInComponent {
       (data)=>{
         console.log(data);
         localStorage.setItem('User',JSON.stringify(data));
-        alert('success');
+        alert('Log in success');
         this.router.navigate(['task']);
       },
       (error)=>{
         console.log(error);
-        alert('failed');
+        alert('Log in failed');
       }
       )
   }

@@ -16,34 +16,41 @@ import java.util.List;
 public class UserService {
     @Autowired
     UserRepository userRepository;
-    public Users addSignUpUser(Users user){
-        return userRepository.save(user);
+    public Users addSignUpUser (Users user) throws Exception{
+        Users users=new Users();
+        try{
+            users=userRepository.save(user);
+        }
+        catch (Exception e){
+           throw new Exception("Email exist");
+        }
+        return users;
     }
-    public UserLoginResponseDTO checkLogIn(UserLogInDTO logInDetails){
+    public UserLoginResponseDTO checkLogIn(UserLogInDTO logInDetails) throws Exception{
         Users user=userRepository.findByEmail(logInDetails.getEmail());
         List<TaskResponseDto> userTasks=new ArrayList<>();
-        for(Task task:user.getTasks()){
-            TaskResponseDto taskResponseDto=TaskResponseDto.builder()
-                    .id(task.getId())
-                    .name(task.getName())
-                    .description(task.getDescription())
-                    .dueDate(task.getDueDate())
-                    .email(logInDetails.getEmail())
-                    .taskStatus(task.getTaskStatus())
+        if(user.getPassword().equals(logInDetails.getPassword())) {
+            for (Task task : user.getTasks()) {
+                TaskResponseDto taskResponseDto = TaskResponseDto.builder()
+                        .id(task.getId())
+                        .name(task.getName())
+                        .description(task.getDescription())
+                        .dueDate(task.getDueDate())
+                        .email(logInDetails.getEmail())
+                        .taskStatus(task.getTaskStatus())
+                        .build();
+                userTasks.add(taskResponseDto);
+            }
+            UserLoginResponseDTO userLoginResponseDTO = UserLoginResponseDTO.builder()
+                    .id(user.getId())
+                    .email(user.getEmail())
+                    .password(user.getPassword())
+                    .name(user.getName())
+                    .tasks(userTasks)
                     .build();
-            userTasks.add(taskResponseDto);
-        }
-        UserLoginResponseDTO userLoginResponseDTO=UserLoginResponseDTO.builder()
-                .id(user.getId())
-                .email(user.getEmail())
-                .password(user.getPassword())
-                .name(user.getName())
-                .tasks(userTasks)
-                .build();
-        UserLoginResponseDTO user2=new UserLoginResponseDTO();
-        if(user.getPassword().equals(logInDetails.getPassword()))
             return userLoginResponseDTO;
+        }
         else
-            return user2;
+           throw new Exception("Login Failed");
     }
 }

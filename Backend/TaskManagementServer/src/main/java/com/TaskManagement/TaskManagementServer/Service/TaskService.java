@@ -20,8 +20,14 @@ public class TaskService {
     TaskRepository taskRepository;
     @Autowired
     UserRepository userRepository;
-    public TaskResponseDto addTask(TaskRequestDTO taskRequestDTO){
-        Users user=userRepository.findByEmail(taskRequestDTO.getEmail());
+    public TaskResponseDto addTask(TaskRequestDTO taskRequestDTO) throws Exception{
+        Users user;
+        try{
+            user=userRepository.findByEmail(taskRequestDTO.getEmail());
+        }
+        catch(Exception e){
+            throw new Exception("email not found");
+        }
 //        List<Task> taskToBeAdded=new ArrayList<>();
         Task taskToBeAdded=new Task();
         taskToBeAdded.setDescription(taskRequestDTO.getDescription());
@@ -49,8 +55,14 @@ public class TaskService {
         return taskResponseDto;
         //return 1;
     }
-    public List<TaskResponseDto> getTasks(String email){
-        Users user=userRepository.findByEmail(email);
+    public List<TaskResponseDto> getTasks(String email) throws Exception{
+        Users user;
+        try{
+            user=userRepository.findByEmail(email);
+        }
+        catch(Exception e){
+            throw new Exception("email not found");
+        }
         List<TaskResponseDto> allTasks=new ArrayList<>();
         //List<Task> userTasks;
         for(Task task:user.getTasks()){
@@ -75,7 +87,6 @@ public class TaskService {
         task.setTaskStatus(taskResponseDto.getTaskStatus());
         task.setDueDate(taskResponseDto.getDueDate());
         return taskRepository.save(task);
-
         //return taskResponseDto;
     }
     public void deleteTask(int id){

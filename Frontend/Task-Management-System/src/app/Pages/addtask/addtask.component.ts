@@ -25,12 +25,12 @@ export class AddtaskComponent {
     this.taskService.add(this.task).subscribe(
       (data)=>{
         console.log(data);
-        alert('success');
+        alert('Task added Succeessfully');
         this.router.navigate(['task'])
       },
       (error)=>{
         console.log(error);
-        alert('failed');
+        alert('task adding failed');
       }
     )
   }

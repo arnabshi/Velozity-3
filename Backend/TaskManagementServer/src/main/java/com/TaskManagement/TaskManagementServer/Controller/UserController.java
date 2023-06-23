@@ -1,6 +1,7 @@
 package com.TaskManagement.TaskManagementServer.Controller;
 
 import com.TaskManagement.TaskManagementServer.DTO.UserLogInDTO;
+import com.TaskManagement.TaskManagementServer.DTO.UserLoginResponseDTO;
 import com.TaskManagement.TaskManagementServer.Model.Users;
 import com.TaskManagement.TaskManagementServer.Service.UserService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -18,11 +19,25 @@ public class UserController {
     @PostMapping("/signup")
     public ResponseEntity signUp(@RequestBody Users user){
         //userService.addSignUpUser(user);
-        return new ResponseEntity(userService.addSignUpUser(user),HttpStatus.CREATED);
+        Users users;
+        try {
+            users=userService.addSignUpUser(user);
+        }
+        catch(Exception e){
+           return new ResponseEntity(e.getMessage(),HttpStatus.NOT_ACCEPTABLE);
+        }
+        return new ResponseEntity(users,HttpStatus.CREATED);
     }
     //@CrossOrigin(origins = "http://localhost:8080/user/login")
     @PostMapping("/login")
     public  ResponseEntity logIn(@RequestBody UserLogInDTO userLoginDTO){
-        return new ResponseEntity<>(userService.checkLogIn(userLoginDTO),HttpStatus.ACCEPTED);
+        UserLoginResponseDTO userLoginResponseDTO;
+        try{
+            userLoginResponseDTO=userService.checkLogIn(userLoginDTO);
+        }
+        catch (Exception e){
+            return new ResponseEntity<>(e.getMessage(),HttpStatus.UNAUTHORIZED);
+        }
+        return new ResponseEntity<>(userLoginResponseDTO,HttpStatus.ACCEPTED);
     }
 }

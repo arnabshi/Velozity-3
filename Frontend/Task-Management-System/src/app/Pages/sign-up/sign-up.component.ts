@@ -1,4 +1,5 @@
 import { Component } from '@angular/core';
+import { Router } from '@angular/router';
 import { UserService } from 'src/app/Services/user.service';
 
 @Component({
@@ -8,7 +9,7 @@ import { UserService } from 'src/app/Services/user.service';
 })
 export class SignUpComponent {
 
-  constructor(private userService:UserService){}
+  constructor(private userService:UserService,private router:Router){}
   public user={
     name:'',
     email:'',
@@ -20,11 +21,18 @@ export class SignUpComponent {
     this.userService.addUser(this.user).subscribe(
       (data)=>{
         console.log(data);
-        alert('success');
+        this.user={
+          name:'',
+          email:'',
+          password:''
+        }
+        alert('Sign up success, please log in');
+        this.router.navigate(['login'])
       },
       (error)=>{
         console.log(error);
-        alert('failed');
+        alert('sign up failed');
+        this.user.password=''
       }
       )
   }
