@@ -1,0 +1,34 @@
+<!-- Footer -->
+<!-- <footer class="page-footer font-small blue pt-4">
+
+    <div class="card-footer text-muted">
+        <div class="footer-copyright text-center py-3">© 2020 Copyright:
+            <a href="/"> Arnab.Shi</a>
+          </div>
+      </div>
+  </footer> -->
+  
+  <div class="card-body">
+    <div class="row justify-content-center p-4">
+        <form [formGroup]="dataForm" (ngSubmit)="onLogin()">
+
+            <label for="id">ID: </label><br>
+            <input type="text" formControlName="id">
+            <span class='error' *ngIf="!dataForm.get('id').valid && (dataForm.get('id').touched)"><br>
+<span *ngIf="dataForm.get('id').hasError('required')">please put your unique ID</span>
+            <span *ngIf="dataForm.get('id').errors.minlength && !dataForm.get('id').hasError('pattern')">ID should be of 6 digits</span>
+            <span *ngIf="dataForm.get('id').hasError('pattern')">Id should be in digits</span>
+            <span *ngIf="dataForm.get('id').hasError('maxlength') && !dataForm.get('id').hasError('pattern')">ID can't be more than 6 digits</span>
+            </span>
+            <br><br>
+            <label for="password">password: </label><br>
+            <input type="password" formControlName="password">
+            <span class='error' *ngIf="!dataForm.get('password').valid && (dataForm.get('password').touched)"><br>
+                <span *ngIf="dataForm.get('password').hasError('required')">please provide a password</span>
+            <span *ngIf="dataForm.get('password').errors.minlength">minimum length should be 6 char</span>
+            </span>
+            <br><br>
+            <button type="submit" class="btn btn-primary" [disabled]='!dataForm.valid'>Log in</button>
+        </form>
+    </div>
+</div>
