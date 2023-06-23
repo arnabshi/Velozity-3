@@ -17,4 +17,7 @@ export class TaskService {
   public add(task:any){
     return this.http.post(`${baseUrl}/tasks/addtask`,task)
   }
+  public delete(id:any){
+    return this.http.delete(`${baseUrl}/tasks/deletetask?id=${id}`)
+  }
 }

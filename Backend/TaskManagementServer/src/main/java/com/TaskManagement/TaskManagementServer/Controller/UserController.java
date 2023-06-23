@@ -8,6 +8,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+@CrossOrigin("*")
 @RestController
 @RequestMapping("/user")
 //@CrossOrigin("*")
@@ -19,6 +20,7 @@ public class UserController {
         //userService.addSignUpUser(user);
         return new ResponseEntity(userService.addSignUpUser(user),HttpStatus.CREATED);
     }
+    //@CrossOrigin(origins = "http://localhost:8080/user/login")
     @PostMapping("/login")
     public  ResponseEntity logIn(@RequestBody UserLogInDTO userLoginDTO){
         return new ResponseEntity<>(userService.checkLogIn(userLoginDTO),HttpStatus.ACCEPTED);

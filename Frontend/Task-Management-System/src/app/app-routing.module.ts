@@ -8,6 +8,11 @@ import { AddtaskComponent } from './Pages/addtask/addtask.component';
 
 const routes: Routes = [
   {
+    path:'',
+    component:TaskComponent,
+    pathMatch:"full"
+  },
+  {
     path:'signup',
     component:SignUpComponent
   },

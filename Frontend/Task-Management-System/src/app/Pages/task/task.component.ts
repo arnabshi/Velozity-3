@@ -25,8 +25,11 @@ export class TaskComponent implements OnInit{
     
     this.taskService.getTasks(this.getUser.email).subscribe(
       (data:any)=>{
-        console.log(data)
-        //Tasks=data.task;
+        // data.array.forEach((element:any) => {
+        //   console.log(element.id)
+        // });
+        this.Tasks=data;
+        console.log(this.Tasks)
       },
       (error)=>{
         console.log(error)
@@ -36,6 +39,19 @@ export class TaskComponent implements OnInit{
   addTask(){
     this.router.navigate(['addtask']);
   }
-  
+   deleteItem(id:any){
+    console.log(id)
+    this.taskService.delete(id).subscribe(
+      (data:any)=>{
+        console.log(data)
+        this.getTasks();
+        alert("Deleted Successfully")
+      },
+      (error)=>{
+        console.log(error)
+        alert("Deletion failed")
+      }
+    )
+   }
 
 }

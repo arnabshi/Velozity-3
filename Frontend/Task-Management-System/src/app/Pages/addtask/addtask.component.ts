@@ -20,7 +20,8 @@ export class AddtaskComponent {
   }
 
   formSubmit(){
-    this.task.email=this.taskService.getEmail();
+    this.task.email=this.taskService.getEmail().email;
+    console.log(this.task)
     this.taskService.add(this.task).subscribe(
       (data)=>{
         console.log(data);
