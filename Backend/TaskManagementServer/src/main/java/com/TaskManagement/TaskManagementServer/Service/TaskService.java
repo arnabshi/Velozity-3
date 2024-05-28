@@ -1,5 +1,6 @@
 package com.TaskManagement.TaskManagementServer.Service;
 
+import com.TaskManagement.TaskManagementServer.Config.JwtUtils;
 import com.TaskManagement.TaskManagementServer.DTO.TaskRequestDTO;
 import com.TaskManagement.TaskManagementServer.DTO.TaskResponseDto;
 import com.TaskManagement.TaskManagementServer.Enum.TaskStatus;
@@ -8,11 +9,14 @@ import com.TaskManagement.TaskManagementServer.Model.Users;
 import com.TaskManagement.TaskManagementServer.Repository.TaskRepository;
 import com.TaskManagement.TaskManagementServer.Repository.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.EmptyResultDataAccessException;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.authentication.BadCredentialsException;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Service
 public class TaskService {
@@ -20,10 +24,13 @@ public class TaskService {
     TaskRepository taskRepository;
     @Autowired
     UserRepository userRepository;
-    public TaskResponseDto addTask(TaskRequestDTO taskRequestDTO) throws Exception{
+    @Autowired
+    JwtUtils jwtUtils;
+    public TaskResponseDto addTask(TaskRequestDTO taskRequestDTO,String jwtToken) throws Exception{
+        String email=getEmail(jwtToken);
         Users user;
         try{
-            user=userRepository.findByEmail(taskRequestDTO.getEmail());
+            user=userRepository.findByEmail(email);
         }
         catch(Exception e){
             throw new Exception("email not found");
@@ -42,27 +49,27 @@ public class TaskService {
 //                .user(user)
 //                .build();
         user.getTasks().add(taskToBeAdded);
-        userRepository.save(user);
-//        taskRepository.save(taskToBeAdded);
+//        userRepository.save(user);
+        taskToBeAdded=taskRepository.save(taskToBeAdded);
         TaskResponseDto taskResponseDto=TaskResponseDto.builder()
                 .id(taskToBeAdded.getId())
                 .name(taskToBeAdded.getName())
                 .description(taskToBeAdded.getDescription())
-                .dueDate(taskRequestDTO.getDueDate())
-                .email(taskRequestDTO.getEmail())
+                .dueDate(taskToBeAdded.getDueDate())
                 .taskStatus(taskToBeAdded.getTaskStatus())
                 .build();
         return taskResponseDto;
         //return 1;
     }
-    public List<TaskResponseDto> getTasks(String email) throws Exception{
-        Users user;
-        try{
-            user=userRepository.findByEmail(email);
-        }
-        catch(Exception e){
-            throw new Exception("email not found");
-        }
+    public List<TaskResponseDto> getTasks(String jwtToken) throws Exception{
+        String userName=getEmail(jwtToken);
+//        try {
+//            userName=jwtUtils.getUsernameFromToken(jwtToken);
+//        }
+//        catch (Exception e) {
+//            throw new BadCredentialsException(" Token is not valid  !!");
+//        }
+        Users user=userRepository.findByEmail(userName);
         List<TaskResponseDto> allTasks=new ArrayList<>();
         //List<Task> userTasks;
         for(Task task:user.getTasks()){
@@ -71,7 +78,6 @@ public class TaskService {
                     .name(task.getName())
                     .description(task.getDescription())
                     .dueDate(task.getDueDate())
-                    .email(email)
                     .taskStatus(task.getTaskStatus())
                     .build();
             allTasks.add(taskResponseDto);
@@ -79,17 +85,45 @@ public class TaskService {
         return allTasks;
 
     }
-    public Task updateTask(TaskResponseDto taskResponseDto){
+    public TaskResponseDto updateTask(TaskResponseDto taskRequestDto) throws Exception {
         TaskResponseDto taskResponseDto2=new TaskResponseDto();
-        Task task=taskRepository.findById(taskResponseDto.getId()).get();
-        task.setName(taskResponseDto.getName());
-        task.setDescription(taskResponseDto.getDescription());
-        task.setTaskStatus(taskResponseDto.getTaskStatus());
-        task.setDueDate(taskResponseDto.getDueDate());
-        return taskRepository.save(task);
-        //return taskResponseDto;
+        Task task=null;
+        try{
+            task=taskRepository.findById(taskRequestDto.getId()).get();
+        }
+        catch (Exception e){
+            throw new Exception("Task is not present,error :"+ e.getMessage());
+        }
+        task.setName(taskRequestDto.getName());
+        task.setDescription(taskRequestDto.getDescription());
+        task.setTaskStatus(taskRequestDto.getTaskStatus());
+        task.setDueDate(taskRequestDto.getDueDate());
+        Task taskToBeAdded=taskRepository.save(task);
+        TaskResponseDto taskResponseDto=TaskResponseDto.builder()
+                .id(taskToBeAdded.getId())
+                .name(taskToBeAdded.getName())
+                .description(taskToBeAdded.getDescription())
+                .dueDate(taskToBeAdded.getDueDate())
+                .taskStatus(taskToBeAdded.getTaskStatus())
+                .build();
+        return taskResponseDto;
     }
-    public void deleteTask(int id){
-         taskRepository.deleteById(id);
+    public void deleteTask(UUID id) throws Exception {
+        try {
+            taskRepository.delete(taskRepository.findById(id).get());
+        }catch (NoSuchElementException e){
+            throw new NoSuchElementException("Task is not exist");
+        }catch (Exception e){
+            throw new Exception("Not Authorized");
+        }
+
+    }
+    private String getEmail(String jwtToken){
+        try {
+            return jwtUtils.getUsernameFromToken(jwtToken);
+        }
+        catch (Exception e) {
+            throw new BadCredentialsException(" Token is not valid  !!");
+        }
     }
 }

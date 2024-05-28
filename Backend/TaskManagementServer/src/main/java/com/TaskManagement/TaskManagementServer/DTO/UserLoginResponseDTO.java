@@ -15,9 +15,8 @@ import java.util.List;
 @Setter
 @Builder
 public class UserLoginResponseDTO {
-    private int id;
     private String email;
-    private String password;
+    private String jwtToken;
     private String name;
     List<TaskResponseDto> tasks=new ArrayList<>();
 }

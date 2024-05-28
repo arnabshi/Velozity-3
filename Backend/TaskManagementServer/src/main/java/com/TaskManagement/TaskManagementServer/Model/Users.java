@@ -1,10 +1,8 @@
 package com.TaskManagement.TaskManagementServer.Model;
 
 import jakarta.persistence.*;
-import lombok.AllArgsConstructor;
-import lombok.Getter;
-import lombok.NoArgsConstructor;
-import lombok.Setter;
+import lombok.*;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -14,6 +12,7 @@ import java.util.List;
 @AllArgsConstructor
 @Getter
 @Setter
+@Builder
 public class Users {
 
     @Id
@@ -23,6 +22,7 @@ public class Users {
     private String email;
     private String password;
     private String name;
+    private List<GrantedAuthority> authorities;
     @OneToMany(mappedBy = "user",cascade = CascadeType.ALL)
     List<Task> tasks=new ArrayList<>();
 }
